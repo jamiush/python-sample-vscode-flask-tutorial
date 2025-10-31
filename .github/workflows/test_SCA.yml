@@ -31,7 +31,7 @@ jobs:
         pip install cyclonedx-bom
     - name: Create BOM
       run: |
-        cyclonedx-py -o bom.xml
+        cyclonedx-py -r -i requirements.txt -o bom.xml
 
     - name: Upload BOM to Dependency-Track
       run: |
