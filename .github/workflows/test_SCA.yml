@@ -9,25 +9,30 @@ permissions:
   id-token: write
   contents: read
 
-
 jobs:
   Build_Publish_Stage:
     runs-on: ubuntu-latest
     name: Build, Publish, and Stage
     steps:
     - uses: actions/checkout@v2
-    - name: Run a multi-line script
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
       run: |
-        npm install --global @cyclonedx/cyclonedx-npm
-        npm i -g typescript ts-node
-        npm install --production --unsafe-perm
-        npm dedupe
-      shell: bash
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Install CycloneDX Python module
+      run: |
+        pip install cyclonedx-bom
     - name: Create BOM
       run: |
-        npm install -g @cyclonedx/cyclonedx-npm@latest
-        npm run sbom
-      shell: bash
+        cyclonedx-py -o bom.xml
+
     - name: Upload BOM to Dependency-Track
       run: |
         curl -v -X "POST" "${{ secrets.DTRACK_API_ENDPOINT }}" \
